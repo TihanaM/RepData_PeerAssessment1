@@ -1,9 +1,3 @@
----
-output: 
-  html_document: 
-    fig_caption: yes
-    keep_md: yes
----
 **Reproducible Research - Project Assignment 1 **
 ==================================================
 
@@ -25,11 +19,29 @@ As an assignment for the Coursera course on Reproducible Research, the goal was 
 - Also, `echo = TRUE` has been selected for all the code chunks, so that they are visible to reviewers.
  
 
-```{r}
+
+```r
 library(knitr)
 opts_chunk$set(echo = TRUE)
 library(ggplot2)
 library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
 ```
   
 <p></br></p>
@@ -38,7 +50,8 @@ library(dplyr)
 
 The file, `activity.csv`, provided through the [link](https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip) on the course website, was downloaded into the working directory, and using `read.csv()` was read into R.
 
-```{r}
+
+```r
 data_steps<-read.csv("./activity.csv")
 ```
 <p></br></p>
@@ -50,17 +63,48 @@ To get an idea for the data `head()`, `str()`, and `summary()` were used, highli
 *  **interval**: Identifier for the 5-minute interval in which measurement was taken      
 <p></br></p>
 
-```{r}
+
+```r
 head(data_steps)
 ```
 
+```
+##   steps       date interval
+## 1    NA 2012-10-01        0
+## 2    NA 2012-10-01        5
+## 3    NA 2012-10-01       10
+## 4    NA 2012-10-01       15
+## 5    NA 2012-10-01       20
+## 6    NA 2012-10-01       25
+```
 
-```{r}
+
+
+```r
 str(data_steps)
 ```
 
-```{r}
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : Factor w/ 61 levels "2012-10-01","2012-10-02",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
+```
+
+
+```r
 summary(data_steps)
+```
+
+```
+##      steps                date          interval     
+##  Min.   :  0.00   2012-10-01:  288   Min.   :   0.0  
+##  1st Qu.:  0.00   2012-10-02:  288   1st Qu.: 588.8  
+##  Median :  0.00   2012-10-03:  288   Median :1177.5  
+##  Mean   : 37.38   2012-10-04:  288   Mean   :1177.5  
+##  3rd Qu.: 12.00   2012-10-05:  288   3rd Qu.:1766.2  
+##  Max.   :806.00   2012-10-06:  288   Max.   :2355.0  
+##  NA's   :2304     (Other)   :15840
 ```
 <p></br></p>
 
@@ -78,7 +122,8 @@ To determine the total number of steps taken each day, as well as the mean and m
 * the data had to be grouped by `date` using `group_by` 
 * the grouped data had to be summarized by the `sum` of `steps` using `summarize`
 
-```{r}
+
+```r
 data_days<-group_by(data_steps, date)
 sum_days<-summarize(data_days, total_steps=sum(steps, na.rm=TRUE))
 mean_steps_per_day<-mean(sum_days$total_steps)
@@ -86,13 +131,19 @@ median_steps_per_day<-median(sum_days$total_steps)
 
 summary(sum_days$total_steps, digits=5)
 ```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##     0.0  6778.0 10395.0  9354.2 12811.0 21194.0
+```
 The `summary` function provides us with the mean and median values.
 <p></br></p>
 
 #####**2.1.2 Plot**
 `ggplot` was used to produce a histogram, also highlighting the position of the `mean` and the `median` of the data. 
 
-```{r Figure 1}
+
+```r
 g1<-ggplot(sum_days, aes(x=total_steps))+
         geom_histogram(breaks = seq(0,22000,by=2000), colour="white", fill="gainsboro")+
         theme_bw()+
@@ -111,6 +162,8 @@ g1<-ggplot(sum_days, aes(x=total_steps))+
 g1
 ```
 
+![](PA1_template_files/figure-html/Figure 1-1.png)<!-- -->
+
 
 
 <p></br></p>
@@ -124,7 +177,8 @@ To be able to produce the time series plot of the average number of steps taken 
 * using `summarize` the average number of steps per time interval were obtained
 * using `max` and `filter` the most active time interval and the maximum number of steps in a 5-min interval were extracted
 
-```{r}
+
+```r
 time_interval<-group_by(data_steps, interval)
 average_time_interval<-summarize(time_interval, interval_average=mean(steps, na.rm=TRUE))    
 
@@ -134,10 +188,18 @@ most_active_interval<-most_active_interval_subset$interval
 
 print (c("The most active interval is ", most_active_interval, "with the maximum number of steps at ", highest_interval_average))
 ```
+
+```
+## [1] "The most active interval is "        
+## [2] "835"                                 
+## [3] "with the maximum number of steps at "
+## [4] "206.169811320755"
+```
 <p></br></p>
 #####**2.2.2 Plot**
 `ggplot` was used to produce a time series plot, also highlighting the most active time interval and the corresponding maximum average number of steps during that interval.
-```{r Figure 2}        
+
+```r
 g2<-ggplot(average_time_interval, aes(interval, interval_average))+geom_line(size=0.65) +
         ylab("Time Interval Step Average")+xlab("Time Interval")+
         scale_x_continuous(breaks=seq(0,2400,by=200))+
@@ -154,6 +216,8 @@ g2<-ggplot(average_time_interval, aes(interval, interval_average))+geom_line(siz
         theme(plot.title = element_text(size=16, face="bold", margin=margin(20,0,20,0)))
 g2
 ```
+
+![](PA1_template_files/figure-html/Figure 2-1.png)<!-- -->
 <p></br></p>
 
 ###**3. Analysis Taking Into Account Missing Data**  
@@ -163,9 +227,14 @@ A number of days and intervals in the original data set contained missing values
 ####**3.1 Total Number of NAs** 
 In this section the total number of NAs in the original data set is calculated.
 
-```{r}
+
+```r
 number_of_NAs<-sum(is.na(data_steps$steps))
 number_of_NAs
+```
+
+```
+## [1] 2304
 ```
 The number of missing values is 2304.
 <p></br></p>
@@ -181,7 +250,8 @@ The new data set is created, where the mean of each 5-minute interval, previousl
 
 A number of for-loops has been used to perform this task, but I am sure there are more efficient ways of doing this.
 
-```{r}
+
+```r
 new_step_data<-data_steps
 
 all_NA<-which(is.na(new_step_data$steps))
@@ -207,8 +277,13 @@ for (i in 1:length(all_NA)){
 ```
 
 To check that all the fields have been populated, we calculated the number of NA values in the new data set:
-```{r}
+
+```r
 sum(is.na(data_steps_fixed$steps))
+```
+
+```
+## [1] 0
 ```
 
 <p></br></p>
@@ -221,15 +296,35 @@ Just like in section, 2.1.1, to determine the total number of steps taken each d
 * the data had to be grouped by `date` using `group_by` 
 * the grouped data had to be summarized by the `sum` of `steps` using `summarize`
 
-```{r}
+
+```r
 data_days2<-group_by(data_steps_fixed, date)
 
 sum_days2<-summarize(data_days2, total_steps2=sum(steps, na.rm=TRUE))
 summary(sum_days2$total_steps2, digits=5)
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##      41    9819   10766   10766   12811   21194
+```
+
+```r
 mean_steps_per_day2<-mean(sum_days2$total_steps2)
 mean_steps_per_day2
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median_steps_per_day2<-median(sum_days2$total_steps2)
 median_steps_per_day2
+```
+
+```
+## [1] 10766.19
 ```
 Both, the mean and the median were evaluated at 10766 steps for the data set with missing values adjusted. The values have both increased compared to the mean and median of the data set where missing values were omitted.
 
@@ -237,7 +332,8 @@ Both, the mean and the median were evaluated at 10766 steps for the data set wit
 
 #####**3.3.2 Plot**
 `ggplot` was used to produce a histogram, also highlighting the position of the `mean` and the `median` of the data. 
-```{r Figure 3}
+
+```r
 g3<-ggplot(sum_days2, aes(x=total_steps2))+
         geom_histogram(breaks = seq(0,22000,by=2000), colour="white", fill="gainsboro")+
         theme_bw()+
@@ -255,6 +351,8 @@ g3<-ggplot(sum_days2, aes(x=total_steps2))+
         theme(plot.title = element_text(size=13, face="bold", margin=margin(20,0,20,0)))
 g3
 ```
+
+![](PA1_template_files/figure-html/Figure 3-1.png)<!-- -->
 <p></br></p>
 
 
@@ -268,7 +366,8 @@ To extract the desired information from the data set, a few modifications were r
 * A new column `day` was added to the data set, which is a factor variable with two levels - **weekday** and **weekend**
 
 
-```{r}
+
+```r
 data_steps_weekday_weekends<-data_steps_fixed
 data_steps_weekday_weekends$date<-as.Date(data_steps_weekday_weekends$date)
 data_steps_weekday_weekends<-cbind(day = "week", data_steps_weekday_weekends)
@@ -277,7 +376,8 @@ data_steps_weekday_weekends$day<-factor(data_steps_weekday_weekends$day, levels=
 
 * Using the `weekdays` function, all the dates were checked if they are weekend or weekday and the appropriate level was noted in the `day` column
 
-```{r}
+
+```r
 for (i in 1:17568){
         if(weekdays(data_steps_weekday_weekends[i,3])=="Saturday")
                 data_steps_weekday_weekends[i,1]="weekend"
@@ -290,17 +390,33 @@ for (i in 1:17568){
 
 * Finally, the data was subsetted by `interval` and `day` and the summary was performed according to the average of the steps taken by interval and subsetted into weekends/weekdays 
 
-```{r}
+
+```r
 data_steps_weekday_weekends1<-data_steps_weekday_weekends
 time_interval_gr<-group_by(data_steps_weekday_weekends1, interval, day)
 average_time_interval_days<-summarize(time_interval_gr, avg_steps_days=mean(steps, na.rm=TRUE))
 head(average_time_interval_days)
 ```
 
+```
+## Source: local data frame [6 x 3]
+## Groups: interval [3]
+## 
+##   interval     day avg_steps_days
+##      <int>  <fctr>          <dbl>
+## 1        0 weekday     1.94375222
+## 2        0 weekend     0.21462264
+## 3        5 weekday     0.38447846
+## 4        5 weekend     0.04245283
+## 5       10 weekday     0.14951940
+## 6       10 weekend     0.01650943
+```
+
 <p></br></p>
 #####**3.4.2 Plot**
 `ggplot` with `facet_wrap` was used to create the penal plot of the time series for the two subgroups: weekend and weekday. 
-```{r Figure 4}
+
+```r
 g4<-ggplot(average_time_interval_days, aes(interval, avg_steps_days))+
         geom_line(aes(colour=day), size=0.8 )+
         ylab("Time Interval Step Average")+xlab("Time Interval")+
@@ -313,6 +429,8 @@ g4<-ggplot(average_time_interval_days, aes(interval, avg_steps_days))+
         theme(legend.position="none")
 g4
 ```
+
+![](PA1_template_files/figure-html/Figure 4-1.png)<!-- -->
 
 <p></br></p>
 The graph suggest a different pattern during the week, compared to the weekends. During the week, the subject is more active in the morning hours, but then the activity drops off during the day. On the weekend, the subject is more active throughout the day. One of the reasons might be that during the week, the subject has a more sedentary job and thus a lower activity during the day. 
